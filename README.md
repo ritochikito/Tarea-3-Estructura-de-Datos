@@ -13,16 +13,11 @@ GraphQuest es un juego de laberinto basado en grafos desarrollado en C. En este 
     - [Menú del Juego](#menú-del-juego)
   - [Ejemplo de Interacción](#ejemplo-de-interacción)
   - [Estado de las Funcionalidades](#estado-de-las-funcionalidades)
-  - [Contribuciones](#contribuciones)
-  - [Conclusión](#conclusión)
 
 ## Requisitos
 
 - **Lenguaje de Programación:** C
 - **Compilador:** GCC o cualquier compilador estándar de C
-- **Librerías y Herramientas:**
-  - [Graphviz](https://graphviz.org/): Utilizado para generar visualmente el grafo del laberinto. Asegúrate de tener instalado `dot` o el paquete correspondiente.
-  - Funciones estándar de C para entrada/salida y manejo de archivos (para procesar el CSV).
 - **Sistema Operativo:** Compatible con Windows (MinGW o Visual Studio), Linux y macOS.
 
 ## Compilación y Ejecución
@@ -138,22 +133,3 @@ Cada actualización de escenario o acción ejecutada muestra el siguiente menú:
 
 - **Reinicio y Salida:**  
   Ambas opciones operan de forma estable, permitiendo reiniciar la partida o finalizar el juego sin inconvenientes.
-
-## Contribuciones
-
-- **Integrante 1:**
-
-  - Desarrollo del módulo de lectura y parseo del archivo CSV en C.
-  - Implementación de la construcción del grafo explícito utilizando Graphviz.
-  - Diseño y desarrollo del menú principal.
-
-- **Integrante 2:**
-  - Desarrollo de la lógica para la interacción del juego, incluyendo el manejo del inventario y el cálculo del tiempo consumido.
-  - Implementación del menú de juego y la administración de las acciones del jugador (recoger/descartar ítems, avanzar).
-  - Redacción de la documentación, ejemplos de uso, y descripción del proceso de compilación y ejecución.
-
-## Conclusión
-
-GraphQuest en C combina la estrategia y la gestión de recursos en un desafiante laberinto. Los jugadores deben equilibrar la toma de decisiones en la recolección de ítems y la rapidez en el avance para maximizar su puntaje antes de que se agote el tiempo. Si bien el juego cumple con las funcionalidades básicas, se vislumbran oportunidades de mejora en aspectos como la validación de entradas y la complejidad de los escenarios.
-
-¡Explora GraphQuest, afronta el reto y demuestra tu habilidad para tomar decisiones estratégicas en un entorno lleno de desafíos!
