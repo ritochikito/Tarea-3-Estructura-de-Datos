@@ -36,12 +36,15 @@ int main()
         {
         // 1. Cargar mapa CSV
         case 1:
-            List *habitaciones = cargarHabitacionesDesdeCSV("graphquest.csv");
-            imprimirHabitaciones(habitaciones);
+            Map *habitacionesMap = createMap();
+            loadHabitacionesFromCSV("graphquest.csv", habitacionesMap);
+            Sleep(300);
+            system("cls");
             break;
 
         // 2. Iniciar partida
         case 2:
+            iniciarPartida(habitacionesMap);
             break;
 
         // 3. Salir del programa
