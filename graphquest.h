@@ -1,6 +1,6 @@
 #include "graphquest.c"
-// Función para crear una lista
-List *createList();
+// Función para crear un inventario
+Inventario *createInventario();
 
 // Prototipos de funciones para el Map
 Map *createMap();
@@ -25,3 +25,7 @@ void imprimirHabitacion(Map *habitaciones, int key);
 void iniciarPartida(Map *habitaciones);
 
 MapNode *buscarNodo(Map *habitaciones, int key);
+
+void recogerItems(Habitacion *habActual, Inventario *inv);
+
+void descartarItems(Habitacion *habActual, Inventario *inv);

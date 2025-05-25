@@ -3,25 +3,18 @@
 #include <stdbool.h>
 #include <string.h>
 #include <windows.h>
+#include <math.h>
 
 // ============================
 // Estructuras ya definidas
 // ============================
-typedef struct Node
+typedef struct Inventario
 {
-    struct Node *prev;
     struct Item *items;
     int pesoTotal;
     int puntosTotal;
-    struct Node *next;
-} Node;
-
-typedef struct List
-{
-    Node *head;
-    Node *current;
     int size;
-} List;
+} Inventario;
 
 typedef struct Item
 {
@@ -41,22 +34,19 @@ typedef struct Habitacion
     int esFinal; // 1 si es final, 0 si no
 } Habitacion;
 
-List *createList()
+Inventario *createInventario()
 {
-    List *lista = (List *)malloc(sizeof(List));
-
-    if (!lista)
+    Inventario *inv = (Inventario *)malloc(sizeof(Inventario));
+    if (!inv)
         return NULL;
 
-    lista->current = NULL;
-    lista->head = NULL;
-    lista->size = 0;
+    inv->items = NULL;
+    inv->pesoTotal = 0;
+    inv->puntosTotal = 0;
+    inv->size = 0;
 
-    return lista;
+    return inv;
 }
-
-// Ya tienes una función createList(), pero para este ejemplo usaremos un "map" para
-// almacenar las habitaciones usando el id como clave.
 
 // ============================
 // TDA MAP (Árbol Binario)
@@ -346,8 +336,210 @@ void imprimirHabitacion(Map *habitaciones, int key)
     printf("-----------------------------\n");
 }
 
+void imprimirInventario(Inventario *inv)
+{
+    if (!inv->items)
+    {
+        printf("  No hay ítems en el inventario\n");
+    }
+    else
+    {
+        printf("ítems: \n");
+
+        Item *item = inv->items;
+        while (item != NULL)
+        {
+            printf("  - %s (Puntos: %d, Peso: %d kg)\n", item->nombre, item->puntos, item->peso);
+            item = item->next;
+        }
+    }
+    printf("  Peso total: %d KG\n", inv->pesoTotal);
+    printf("  Puntos totales: %d Pts\n", inv->puntosTotal);
+}
+
+void recogerItems(Habitacion *habActual, Inventario *inv)
+{
+    // Verificamos si la habitación tiene algún ítem
+    if (!habActual->items)
+    {
+        printf("No hay ítems en esta habitación.\n");
+        return;
+    }
+
+    int opcion;
+    do
+    {
+        // Contador para saber cuántos ítems hay actualmente
+        int contador = 0;
+        Item *current = habActual->items;
+
+        // Imprimimos la lista actualizada de ítems disponibles
+        printf("\nÍtems disponibles para recoger:\n");
+        while (current != NULL)
+        {
+            contador++;
+            printf("  %d - %s (Puntos: %d, Peso: %d kg)\n", contador, current->nombre, current->puntos, current->peso);
+            current = current->next;
+        }
+        // Opción extra para finalizar la recolección
+        printf("  %d - Finalizar recolección\n", contador + 1);
+        printf("Seleccione el ítem a recoger: ");
+        if (scanf("%d", &opcion) != 1)
+        {
+            // Evitamos problemas en lectura de la opción
+            printf("Entrada no válida.\n");
+            break;
+        }
+        if (opcion < 1 || opcion > contador + 1)
+        {
+            printf("Opción inválida. Intenta de nuevo.\n");
+            continue;
+        }
+        // Si el usuario elige finalizar, se rompe el ciclo
+        if (opcion == contador + 1)
+        {
+            break;
+        }
+
+        // Buscamos el ítem que corresponde al índice seleccionado.
+        Item *prev = NULL;
+        current = habActual->items;
+        int index = 1;
+        while (current != NULL && index < opcion)
+        {
+            prev = current;
+            current = current->next;
+            index++;
+        }
+
+        if (current != NULL)
+        {
+            // Extraemos el ítem de la lista de la habitación
+            if (prev == NULL)
+            {
+                // El ítem se encuentra al inicio de la lista
+                habActual->items = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+
+            // Agregamos el ítem al inicio de la lista del inventario
+            current->next = inv->items;
+            inv->items = current;
+
+            // Actualizamos los totales del inventario
+            inv->puntosTotal += current->puntos;
+            inv->pesoTotal += current->peso;
+            inv->size++;
+
+            printf("Has recogido: %s\n", current->nombre);
+        }
+        else
+        {
+            printf("Error al recoger el ítem. Intenta de nuevo.\n");
+        }
+    } while (habActual->items != NULL);
+
+    if (habActual->items == NULL)
+    {
+        printf("No quedan más ítems en esta habitación.\n");
+    }
+    printf("-----------------------------\n");
+}
+
+void descartarItems(Habitacion *habActual, Inventario *inv)
+{
+    // Verificamos si el inventario tiene ítems
+    if (inv->items == NULL)
+    {
+        printf("No tienes ítems en el inventario para descartar.\n");
+        return;
+    }
+
+    int opcion;
+
+    do
+    {
+        // Mostrar los ítems actuales en el inventario
+        int contador = 0;
+        Item *actual = inv->items;
+        printf("\nÍtems en tu inventario:\n");
+        while (actual != NULL)
+        {
+            contador++;
+            printf("  %d - %s (Puntos: %d, Peso: %d kg)\n", contador, actual->nombre, actual->puntos, actual->peso);
+            actual = actual->next;
+        }
+        // Opción para cancelar el descarte
+        printf("  %d - Cancelar descarte\n", contador + 1);
+        printf("Seleccione el ítem a descartar: ");
+
+        if (scanf("%d", &opcion) != 1)
+        {
+            printf("Entrada no válida.\n");
+            break;
+        }
+        if (opcion < 1 || opcion > contador + 1)
+        {
+            printf("Opción inválida. Intenta de nuevo.\n");
+            continue;
+        }
+        // Si se selecciona la opción de cancelar, se sale del ciclo
+        if (opcion == contador + 1)
+        {
+            break;
+        }
+
+        // Buscamos el ítem a descartar dentro del inventario
+        Item *prev = NULL;
+        actual = inv->items;
+        int indice = 1;
+        while (actual != NULL && indice < opcion)
+        {
+            prev = actual;
+            actual = actual->next;
+            indice++;
+        }
+
+        if (actual != NULL)
+        {
+            // Se elimina el ítem del inventario
+            if (prev == NULL)
+            {
+                inv->items = actual->next;
+            }
+            else
+            {
+                prev->next = actual->next;
+            }
+
+            // Actualizamos los totales del inventario
+            inv->puntosTotal -= actual->puntos;
+            inv->pesoTotal -= actual->peso;
+            inv->size--;
+
+            // Se agrega el ítem a la habitación actual (al inicio de la lista de ítems de la habitación)
+            actual->next = habActual->items;
+            habActual->items = actual;
+
+            printf("Has descartado: %s\n", actual->nombre);
+        }
+
+    } while (inv->items != NULL);
+
+    if (inv->items == NULL)
+    {
+        printf("No quedan más ítems en el inventario para descartar.\n");
+    }
+    printf("-----------------------------\n");
+}
+
 void iniciarPartida(Map *habitaciones)
 {
+
+    system("cls");
     /*### **Estado Actual**
 
     - Descripción del escenario actual.
@@ -357,31 +549,105 @@ void iniciarPartida(Map *habitaciones)
     - Acciones posibles desde este escenario: direcciones disponibles (arriba, abajo, izquierda, derecha).
     */
 
-    if (habitaciones == NULL)
+    if (!habitaciones->root)
     {
-        printf("No hay habitaciones cargadas");
+        printf("No hay habitaciones cargadas\n");
         return;
     }
 
     float tiempo = 10;
     int idActual = 1;
 
-    MapNode *nodoActual = buscarNodo(habitaciones, idActual);
+    MapNode *nodoActual = buscarNodo(habitaciones, 11);
+    Inventario *inv = createInventario();
 
-    while (nodoActual != NULL)
+    while (nodoActual->habitacion->esFinal == 1 || tiempo != 0)
     {
         Habitacion *habActual = nodoActual->habitacion;
 
-        printf("Habitación Actual n°%d\n", habActual->id);
-        printf("Descripcion: %s\n", habActual->descripcion);
-        printf("Ítems disponibles: \n");
-        printf("Tiempo restante: %0.f\n", tiempo);
-        printf("Inventario: \n");
-        printf("Acciones: arriba, abajo, izquierda, derecha\n");
-        printf("-----------------------------\n");
+        int opcion;
+
+        do
+        {
+            // Dato habitación actual
+            printf("Habitación Actual n°%d\n", habActual->id);
+            printf("Descripcion: %s\n", habActual->descripcion);
+            printf("Ítems disponibles: \n");
+            printf("Tiempo restante: %0.f\n", tiempo);
+            printf("Inventario: \n");
+            imprimirInventario(inv);
+            printf("Acciones: arriba, abajo, izquierda, derecha\n");
+            printf("-----------------------------\n");
+
+            // Menú de opciones
+            printf("Opciones del jugador\n");
+            printf("1. Recoger Ítem(s)\n");
+            printf("2. Descartar Ítem(s)\n");
+            printf("3. Avanzar en una direccion\n");
+            printf("4. Reinciar partida\n");
+            printf("5. Salir del juego\n");
+
+            printf("Seleccione una opción: \n");
+
+            scanf("%d", &opcion);
+
+            while (opcion < 1 || opcion > 5)
+            {
+                printf("Ingrese una opción válida (1-5)\n");
+                scanf("%d", &opcion);
+            }
+
+            switch (opcion)
+            {
+                // Recoger ítem(s)
+            case 1:
+                system("cls");
+                recogerItems(habActual, inv);
+                tiempo -= 1;
+                break;
+
+                // Descartar ítem(s)
+            case 2:
+                system("cls");
+                descartarItems(habActual, inv);
+                tiempo -= 1;
+                break;
+
+                // Avanzar en una dirección
+            case 3:
+
+                tiempo -= ceilf((inv->pesoTotal + 1) / 10);
+                break;
+
+                // Reiniciar Partida
+            case 4:
+                iniciarPartida(habitaciones);
+                return;
+
+                // Salida del programa
+            case 5:
+                printf("Saliendo del programa\n");
+                return;
+
+            default:
+                break;
+            }
+
+        } while (opcion != 5);
 
         free(habActual);
-        nodoActual = nodoActual->right;
     }
     free(nodoActual);
+
+    if (nodoActual->habitacion->esFinal == 1)
+    {
+        printf("Haz completado el laberinto\n");
+        imprimirInventario(inv);
+        return;
+    }
+    if (tiempo <= 0)
+    {
+        printf("Te has quedado sin tiempo0 :c\n");
+        return;
+    }
 }

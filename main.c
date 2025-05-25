@@ -14,6 +14,7 @@ int main()
     // 3. Salir del programa
 
     int opcion;
+    Map *habitacionesMap = createMap();
 
     do
     {
@@ -28,7 +29,7 @@ int main()
 
         while (opcion < 1 || opcion > 3)
         {
-            printf("Ingrese una opción valida (1-5): ");
+            printf("Ingrese una opción válida (1-3)\n");
             scanf("%d", &opcion);
         }
 
@@ -36,7 +37,6 @@ int main()
         {
         // 1. Cargar mapa CSV
         case 1:
-            Map *habitacionesMap = createMap();
             loadHabitacionesFromCSV("graphquest.csv", habitacionesMap);
             Sleep(300);
             system("cls");
@@ -45,11 +45,14 @@ int main()
         // 2. Iniciar partida
         case 2:
             iniciarPartida(habitacionesMap);
-            break;
+            return 0;
 
         // 3. Salir del programa
         case 3:
             printf("Saliendo del programa");
+            break;
+
+        default:
             break;
         }
 
