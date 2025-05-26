@@ -83,7 +83,7 @@ Cada actualización de escenario o acción ejecutada muestra el siguiente menú:
     - Se conserva el inventario.
     - Se descuenta el tiempo utilizado según la fórmula:
       $$
-       \huge T = \left\lceil\frac{\text{Peso Total del Inventario} + 1}{10}\right\rceil
+        T = \left\lceil\frac{\text{Peso Total del Inventario} + 1}{10}\right\rceil
       $$
     - Si se alcanza el escenario final, se muestra el inventario completo y el puntaje.
     - Si el tiempo se agota, se muestra un mensaje de derrota.
