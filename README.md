@@ -81,10 +81,7 @@ Cada actualización de escenario o acción ejecutada muestra el siguiente menú:
     El jugador elige una dirección válida. Al avanzar:
     - Se actualiza el escenario actual.
     - Se conserva el inventario.
-    - Se descuenta el tiempo utilizado según la fórmula:
-      $$
-        T = \left\lceil\frac{\text{Peso Total del Inventario} + 1}{10}\right\rceil
-      $$
+    - Se descuenta el tiempo según el pesos total de los ítems de tu inventario.
     - Si se alcanza el escenario final, se muestra el inventario completo y el puntaje.
     - Si el tiempo se agota, se muestra un mensaje de derrota.
   - **Reiniciar Partida:**  
@@ -131,7 +128,7 @@ Cada actualización de escenario o acción ejecutada muestra el siguiente menú:
   El grafo se genera exitosamente mediante Graphviz.  
   _Causas posibles de fallo:_ Datos incompletos o errores en las conexiones descritas en el CSV.
 
-- **Interacción y Acciones del Jugador:**  
+- **Uso y Acciones del Jugador:**  
   Las funciones de recoger, descartar y avanzar se ejecutan descontando el tiempo conforme a la fórmula.  
   _Áreas de mejora:_ Mayor robustez en la validación de entrada por parte del jugador y el manejo de direcciones no válidas.
 
