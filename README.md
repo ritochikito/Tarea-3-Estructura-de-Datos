@@ -29,7 +29,7 @@ GraphQuest es un juego de laberinto basado en grafos desarrollado en C. En este 
    Navega a la carpeta del proyecto y ejecuta:
 
    ```bash
-   gcc graphquest.c -o graphquest
+   gcc main.c -o graphquest
    ```
 
    Si el proyecto está dividido en varios archivos fuente, puede usarse:
@@ -76,15 +76,15 @@ Cada actualización de escenario o acción ejecutada muestra el siguiente menú:
   - **Recoger Ítem(s):**  
     Permite seleccionar uno o más ítems para agregarlos al inventario. Esta acción descuenta 1 unidad de tiempo.
   - **Descartar Ítem(s):**  
-    Permite eliminar ítems del inventario para reducir el peso y facilitar el avance, consumiendo también 1 unidad de tiempo.
+    Permite eliminar ítems del inventario para reducir el peso y facilitar el avance, consumiendo también 1 unidad de tiempo. Al descartar un ítem, este queda en la habitación donde fue descartado.
   - **Avanzar en una Dirección:**  
     El jugador elige una dirección válida. Al avanzar:
     - Se actualiza el escenario actual.
     - Se conserva el inventario.
     - Se descuenta el tiempo utilizado según la fórmula:
-      \[
-      T = \left\lceil\frac{\text{Peso Total del Inventario} + 1}{10}\right\rceil
-      \]
+      $$
+       \huge T = \left\lceil\frac{\text{Peso Total del Inventario} + 1}{10}\right\rceil
+      $$
     - Si se alcanza el escenario final, se muestra el inventario completo y el puntaje.
     - Si el tiempo se agota, se muestra un mensaje de derrota.
   - **Reiniciar Partida:**  
@@ -102,6 +102,10 @@ Cada actualización de escenario o acción ejecutada muestra el siguiente menú:
 
 2. **Carga del Laberinto:**  
    Selecciona la opción para cargar el laberinto. El programa procesa el archivo `graphquest.csv` y utiliza Graphviz para generar el grafo que representa el laberinto.
+
+   ![Grafico del archivo graphquest.csv](https://file.notion.so/f/f/4f8bebe4-a843-44d2-b6ee-51e2006a90d1/b66b234d-5152-4626-aa1f-b79623e418fc/graphviz.png?table=block&id=1f1d965d-c59e-8035-9afb-e3b9348f5dfd&spaceId=4f8bebe4-a843-44d2-b6ee-51e2006a90d1&expirationTimestamp=1748253600000&signature=A2zQBIZuL6Gxup-c8nBgl0h3JauE-osltmFWFbnDMQo&downloadName=graphviz.png)
+
+   Grafico del archivo graphquest.csv de ejemplo generado por [Graphviz](<https://dreampuf.github.io/GraphvizOnline/?engine=dot#graph%20Laberinto%20%7B%0D%0A%20%20%20%20node%20%5Bshape%3Dbox%2C%20width%3D2%2C%20height%3D1%5D%3B%0D%0A%0D%0A%20%20%20%20%2F%2F%20Primera%20fila%0D%0A%20%20%20%20%7B%20rank%3Dsame%3B%20N1%20%5Blabel%3D%221%3A%20Entrada%20principal%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N2%20%5Blabel%3D%222%3A%20Librer%C3%ADa%5CnLibro%20antiguo%20(6%20pts%2C%202%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N3%20%5Blabel%3D%223%3A%20Caverna%20oscura%5CnLinterna%20(15%20pts%2C%205%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N4%20%5Blabel%3D%224%3A%20Estudio%22%5D%3B%20%7D%0D%0A%0D%0A%20%20%20%20%2F%2F%20Segunda%20fila%0D%0A%20%20%20%20%7B%20rank%3Dsame%3B%20N5%20%5Blabel%3D%225%3A%20Cocina%5CnCuchillo%20(3%20pts%2C%201%20kg)%5CnPan%20(2%20pts%2C%201%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N6%20%5Blabel%3D%226%3A%20Comedor%5CnCopa%20dorada%20(8%20pts%2C%203%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N7%20%5Blabel%3D%227%3A%20S%C3%B3tano%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N8%20%5Blabel%3D%228%3A%20Taller%5CnMartillo%20(5%20pts%2C%203%20kg)%5CnClavos%20(1%20pt%2C%201%20kg)%22%5D%3B%20%7D%0D%0A%0D%0A%20%20%20%20%2F%2F%20Tercera%20fila%0D%0A%20%20%20%20%7B%20rank%3Dsame%3B%20N9%20%5Blabel%3D%229%3A%20Jard%C3%ADn%5CnMoneda%20(2%20pts%2C%201%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N10%20%5Blabel%3D%2210%3A%20Pasillo%5CnLlave%20(5%20pts%2C%201%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N11%20%5Blabel%3D%2211%3A%20Sala%20del%20tesoro%5CnCorona%20(50%20pts%2C%2010%20kg)%5CnCollar%20(20%20pts%2C%204%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N12%20%5Blabel%3D%2212%3A%20Almac%C3%A9n%22%5D%3B%20%7D%0D%0A%0D%0A%20%20%20%20%2F%2F%20Cuarta%20fila%0D%0A%20%20%20%20%7B%20rank%3Dsame%3B%20N13%20%5Blabel%3D%2213%3A%20Dormitorio%5CnRub%C3%AD%20(20%20pts%2C%205%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N14%20%5Blabel%3D%2214%3A%20Corredor%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N15%20%5Blabel%3D%2215%3A%20C%C3%A1mara%20secreta%5CnMapa%20(10%20pts%2C%201%20kg)%22%5D%3B%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20N16%20%5Blabel%3D%2216%3A%20Salida%22%5D%3B%20%7D%0D%0A%0D%0A%20%20%20%20%2F%2F%20Conexiones%20horizontales%20(izq%20--%20der)%0D%0A%0D%0A%20%20%20%20N2%20--%20N3%3B%20N3%20--%20N4%3B%0D%0A%20%20%20%20N5%20--%20N6%3B%20N6%20--%20N7%3B%20%0D%0A%20%20%20%20N10%20--%20N11%3B%20N11--N7%0D%0A%20%20%20%20N13%20--%20N14%3B%20N14%20--%20N15%3B%20N15%20--%20N16%3B%0D%0A%0D%0A%20%20%20%20%2F%2F%20Conexiones%20verticales%20(arriba%20--%20abajo)%0D%0A%20%20%20%20N1%20--%20N5%3B%20N2%20--%20N6%3B%20N3%20--%20N7%3B%20N4%20--%20N8%3B%0D%0A%20%20%20%20N5%20--%20N9%3B%20N6%20--%20N10%3B%20N8%20--%20N12%3B%0D%0A%20%20%20%20N9%20--%20N13%3B%20N10%20--%20N14%3B%20N12%20--%20N16%3B%0D%0A%7D%0D%0A>)
 
 3. **Inicio de la Partida:**  
    Al iniciar la partida, el juego comienza en el escenario de la "Entrada principal". Se muestra:
