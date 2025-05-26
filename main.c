@@ -45,7 +45,7 @@ int main()
         // 2. Iniciar partida
         case 2:
             iniciarPartida(habitacionesMap);
-            return 0;
+            break;
 
         // 3. Salir del programa
         case 3:

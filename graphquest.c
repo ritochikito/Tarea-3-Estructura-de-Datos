@@ -567,6 +567,7 @@ Habitacion *avanzar(Map *habitaciones, Habitacion *habActual)
         movimientos[contador] = habActual->derecha;
         contador++;
     }
+    printf("  %d- Cancelar movimiento\n", contador + 1);
 
     int opcion;
 
@@ -616,108 +617,119 @@ void iniciarPartida(Map *habitaciones)
 
     MapNode *nodoActual = buscarNodo(habitaciones, idActual);
     Inventario *inv = createInventario();
+    Habitacion *habActual = nodoActual->habitacion;
 
-    while (nodoActual->habitacion->esFinal == 1 || tiempo != 0)
+    int opcion;
+
+    do
     {
-        Habitacion *habActual = nodoActual->habitacion;
+        // Dato habitación actual
+        printf("Habitación Actual n°%d\n", habActual->id);
+        printf("Descripcion: %s\n", habActual->descripcion);
+        printf("Ítems disponibles: \n");
 
-        int opcion;
-
-        do
+        Item *item = habActual->items;
+        while (item != NULL)
         {
-            // Dato habitación actual
-            printf("Habitación Actual n°%d\n", habActual->id);
-            printf("Descripcion: %s\n", habActual->descripcion);
-            printf("Ítems disponibles: \n");
+            printf("  - %s (Puntos: %d, Peso: %d kg)\n", item->nombre, item->puntos, item->peso);
+            item = item->next;
+        }
 
-            Item *item = habActual->items;
-            while (item != NULL)
-            {
-                printf("  - %s (Puntos: %d, Peso: %d kg)\n", item->nombre, item->puntos, item->peso);
-                item = item->next;
-            }
+        printf("Tiempo restante: %.3f\n", tiempo);
+        printf("Inventario: \n");
+        imprimirInventario(inv);
+        printf("Acciones: ");
+        if (habActual->arriba != -1)
+            printf("arriba ");
+        if (habActual->abajo != -1)
+            printf("abajo ");
+        if (habActual->izquierda != -1)
+            printf("izquierda ");
+        if (habActual->derecha != -1)
+            printf("derecha ");
+        printf("\n-----------------------------\n");
 
-            printf("Tiempo restante: %0.f\n", tiempo);
-            printf("Inventario: \n");
-            imprimirInventario(inv);
-            printf("Acciones: ");
-            if (habActual->arriba != -1)
-                printf("arriba ");
-            if (habActual->abajo != -1)
-                printf("abajo ");
-            if (habActual->izquierda != -1)
-                printf("izquierda ");
-            if (habActual->derecha != -1)
-                printf("derecha ");
-            printf("\n-----------------------------\n");
+        // Menú de opciones
+        printf("Opciones del jugador\n");
+        printf("1. Recoger Ítem(s)\n");
+        printf("2. Descartar Ítem(s)\n");
+        printf("3. Avanzar en una direccion\n");
+        printf("4. Reinciar partida\n");
+        printf("5. Salir del juego\n");
 
-            // Menú de opciones
-            printf("Opciones del jugador\n");
-            printf("1. Recoger Ítem(s)\n");
-            printf("2. Descartar Ítem(s)\n");
-            printf("3. Avanzar en una direccion\n");
-            printf("4. Reinciar partida\n");
-            printf("5. Salir del juego\n");
+        printf("Seleccione una opción: \n");
 
-            printf("Seleccione una opción: \n");
+        scanf("%d", &opcion);
 
+        while (opcion < 1 || opcion > 5)
+        {
+            printf("Ingrese una opción válida (1-5)\n");
             scanf("%d", &opcion);
+        }
 
-            while (opcion < 1 || opcion > 5)
+        switch (opcion)
+        {
+            // Recoger ítem(s)
+        case 1:
+            system("cls");
+            if (habActual->items == NULL)
             {
-                printf("Ingrese una opción válida (1-5)\n");
-                scanf("%d", &opcion);
-            }
-
-            switch (opcion)
-            {
-                // Recoger ítem(s)
-            case 1:
-                system("cls");
-                recogerItems(habActual, inv);
-                tiempo -= 1;
-                break;
-
-                // Descartar ítem(s)
-            case 2:
-                system("cls");
-                descartarItems(habActual, inv);
-                tiempo -= 1;
-                break;
-
-                // Avanzar en una dirección
-            case 3:
-                habActual = avanzar(habitaciones, habActual);
-                tiempo -= ceilf((inv->pesoTotal + 1) / 10);
-                break;
-
-                // Reiniciar Partida
-            case 4:
-                iniciarPartida(habitaciones);
-                return;
-
-                // Salida del programa
-            case 5:
-                printf("Saliendo del programa\n");
-                return;
-
-            default:
+                printf("No hay ítems para recoger en esta habitación\n");
+                Sleep(100);
                 break;
             }
+            recogerItems(habActual, inv);
+            tiempo -= 1;
+            break;
 
-        } while (opcion != 5);
-    }
+            // Descartar ítem(s)
+        case 2:
+            system("cls");
+            if (inv->items == NULL)
+            {
+                printf("Tu inventario se encuentra vacio\n");
+                Sleep(100);
+                break;
+            }
+            descartarItems(habActual, inv);
+            tiempo -= 1;
+            break;
+
+            // Avanzar en una dirección
+        case 3:
+            system("cls");
+            habActual = avanzar(habitaciones, habActual);
+            tiempo -= ceilf((float)((inv->pesoTotal + 1) / 10));
+            system("cls");
+            break;
+
+            // Reiniciar Partida
+        case 4:
+            iniciarPartida(habitaciones);
+            return;
+
+            // Salida del programa
+        case 5:
+            printf("Volviendo al menú principal\n");
+            return;
+
+        default:
+            break;
+        }
+
+    } while (opcion != 5 && tiempo >= 0 && habActual->esFinal != 1);
     free(nodoActual);
 
-    if (nodoActual->habitacion->esFinal == 1)
+    if (habActual->esFinal == 1)
     {
         printf("Haz completado el laberinto\n");
         imprimirInventario(inv);
         return;
     }
+
     if (tiempo <= 0)
     {
-        printf("Te has quedado sin tiempo0 :c\n");
+        printf("Te has quedado sin tiempo :c\n");
         return;
     }
 }
