@@ -29,3 +29,5 @@ MapNode *buscarNodo(Map *habitaciones, int key);
 void recogerItems(Habitacion *habActual, Inventario *inv);
 
 void descartarItems(Habitacion *habActual, Inventario *inv);
+
+Habitacion *avanzar(Map *habitaciones, Habitacion *habActual);

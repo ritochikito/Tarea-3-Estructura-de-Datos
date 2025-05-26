@@ -536,6 +536,62 @@ void descartarItems(Habitacion *habActual, Inventario *inv)
     printf("-----------------------------\n");
 }
 
+Habitacion *avanzar(Map *habitaciones, Habitacion *habActual)
+{
+    int movimientos[4];
+    int contador = 0;
+
+    printf("Movimientos disponibles: \n");
+
+    if (habActual->arriba != -1)
+    {
+        printf("  %d- Arriba\n", contador + 1);
+        movimientos[contador] = habActual->arriba;
+        contador++;
+    }
+    if (habActual->abajo != -1)
+    {
+        printf("  %d- Abajo\n", contador + 1);
+        movimientos[contador] = habActual->abajo;
+        contador++;
+    }
+    if (habActual->izquierda != -1)
+    {
+        printf("  %d- Izquierda\n", contador + 1);
+        movimientos[contador] = habActual->izquierda;
+        contador++;
+    }
+    if (habActual->derecha != -1)
+    {
+        printf("  %d- Derecha\n", contador + 1);
+        movimientos[contador] = habActual->derecha;
+        contador++;
+    }
+
+    int opcion;
+
+    printf("Seleccione un movimiento: \n");
+    scanf("%d", &opcion);
+
+    while (opcion < 1 || opcion > (contador + 1))
+    {
+        printf("Ingrese una movimiento valido (1-%d): \n", (contador + 1));
+        scanf("%d", &opcion);
+    }
+
+    int nuevoId = movimientos[opcion - 1];
+    MapNode *nuevoNodo = buscarNodo(habitaciones, nuevoId);
+    if (!nuevoNodo)
+    {
+        printf("Error: la habitacion ID %d no se encontró.\n", nuevoId);
+        return habActual;
+    }
+
+    printf("Avanzando a la habitacion con %d: %s\n", nuevoId, nuevoNodo->habitacion->nombre);
+
+    return nuevoNodo->habitacion;
+}
+
 void iniciarPartida(Map *habitaciones)
 {
 
@@ -558,7 +614,7 @@ void iniciarPartida(Map *habitaciones)
     float tiempo = 10;
     int idActual = 1;
 
-    MapNode *nodoActual = buscarNodo(habitaciones, 11);
+    MapNode *nodoActual = buscarNodo(habitaciones, idActual);
     Inventario *inv = createInventario();
 
     while (nodoActual->habitacion->esFinal == 1 || tiempo != 0)
@@ -573,11 +629,27 @@ void iniciarPartida(Map *habitaciones)
             printf("Habitación Actual n°%d\n", habActual->id);
             printf("Descripcion: %s\n", habActual->descripcion);
             printf("Ítems disponibles: \n");
+
+            Item *item = habActual->items;
+            while (item != NULL)
+            {
+                printf("  - %s (Puntos: %d, Peso: %d kg)\n", item->nombre, item->puntos, item->peso);
+                item = item->next;
+            }
+
             printf("Tiempo restante: %0.f\n", tiempo);
             printf("Inventario: \n");
             imprimirInventario(inv);
-            printf("Acciones: arriba, abajo, izquierda, derecha\n");
-            printf("-----------------------------\n");
+            printf("Acciones: ");
+            if (habActual->arriba != -1)
+                printf("arriba ");
+            if (habActual->abajo != -1)
+                printf("abajo ");
+            if (habActual->izquierda != -1)
+                printf("izquierda ");
+            if (habActual->derecha != -1)
+                printf("derecha ");
+            printf("\n-----------------------------\n");
 
             // Menú de opciones
             printf("Opciones del jugador\n");
@@ -615,7 +687,7 @@ void iniciarPartida(Map *habitaciones)
 
                 // Avanzar en una dirección
             case 3:
-
+                habActual = avanzar(habitaciones, habActual);
                 tiempo -= ceilf((inv->pesoTotal + 1) / 10);
                 break;
 
@@ -634,8 +706,6 @@ void iniciarPartida(Map *habitaciones)
             }
 
         } while (opcion != 5);
-
-        free(habActual);
     }
     free(nodoActual);
 
